@@ -1,0 +1,32 @@
+class:
+  class_name: 友情链接
+  link_list:
+    1:
+      name: Spring Cloud中国社区
+      link: http://www.springcloud.cn/
+      avatar: /img/framework.svg
+      descr: 学习、交流Spring Cloud
+    2:
+      name: MybatisPlus
+      link: https://mp.baomidou.com/
+      avatar: /img/mybatis-plus.png
+      descr: MybaitsPlus，为简化开发而生
+    3:
+      name: yuanhaoc's Blog
+      link: https://www.5zero.cn/
+      avatar: /img/yuanhaoc.png
+      descr: 朋友的博客，干货满满  
+
+ # class2:
+ #   class_name: 鏈接無效
+ #   link_list:
+ #     1:
+ #       name: 夢xxx
+ #       link: https://blog.xxx.com
+ #       avatar: https://xxxx/avatar.png
+ #       descr: xxxx
+ #     2:
+ #       name: xx
+ #       link: https://www.axxxx.cn/
+ #       avatar: https://x
+ #       descr: xx
