@@ -1,6 +1,6 @@
 title: JVM类加载机制
 author: Loux
-cover: /img/post/16.jpg
+cover: /img/post/17.jpg
 tags:
   - JVM
 categories:
