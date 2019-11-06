@@ -2,7 +2,6 @@ title: 你的开发伙伴—Mybatis-plus（一）
 author: Loux
 cover: /img/post/3.jpg
 tags:
-
   - mybatis
 categories:
   - 后端知识
@@ -29,7 +28,7 @@ Mybatis-Plus（下面简称MP）只是一个mybatis的增强工具，它只做�
 ****
 #### 快速入门
 1.新建一个idea中新建一个Springboot项目，除了自动生成的pom文件中的依赖外，再引入以下的依赖  
-``` bash
+```xml
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -47,7 +46,7 @@ Mybatis-Plus（下面简称MP）只是一个mybatis的增强工具，它只做�
         </dependency>
 ```
 application.yml中的内容如下
-``` bash
+```yml
 server:
      port: 8888
 spring:
@@ -59,7 +58,7 @@ spring:
 ```
 2.数据库新建数据表user,建表语句及表的内容如下  
 
-``` bash
+```sql
 DROP TABLE IF EXISTS user;
 CREATE TABLE user
 (
@@ -80,7 +79,7 @@ INSERT INTO user (id, name, age, email) VALUES
 ```
 3.新建User类对象和UserDao接口  
 
-``` bash
+```java
 package cn.lxfun.mybatisplust.entity;
 import lombok.Data;
 //加入lombok,自动生成getter/setter和toString方法
@@ -92,13 +91,13 @@ public class User {
     private String email;
 }
 ```
-``` bash
+```java
 //继承了mybatis-plus中的BaseMapper类，自动实现了CRUD方法
 public interface UserDao extends BaseMapper<User> {
 }
 ```
 4.Springboot启动类中加入@MapperScan注解，扫描DAO接口
-``` bash
+```java
 @SpringBootApplication
 @MapperScan("cn.lxfun.mybatisplust.dao")
 public class MybatisplustApplication {
@@ -108,7 +107,7 @@ public class MybatisplustApplication {
 }
 ```
 5.编写测试类进行测试
-``` bash
+```java
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserDaoTest {

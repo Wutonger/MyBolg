@@ -6,8 +6,8 @@ tags:
   - 消息队列
 categories:
   - 后端知识
-date: 2019-07-13 22:24:00
 img: /medias/featureimages/5.jpg
+date: 2019-07-13 22:24:00
 ---
 在前面的工作队列中，每一条消息只能被一个消费者消费。如果我们想要一条消息被多个消费者消费就要使用到RabbitMQ的订阅模式。即先将消息发送到<b>exchange</b>(交换机)，队列绑定交换机后，交换机会将消息转发到队列之中，消费者再从队列中获取消息进行消费。订阅模式官方示例图如下：
 
@@ -26,7 +26,7 @@ img: /medias/featureimages/5.jpg
 #### 订阅模式
 订阅模式采用的交换机类型为fanout exchange,订阅模式java代码示例为：
 <b>生产者：</b>
-```bash
+```java
 public class Send {
     private static final String EXCHANGE_NAME= "test_exchange_fanout";
     public static void main(String[] args) throws IOException, TimeoutException {
@@ -45,7 +45,7 @@ public class Send {
 }
 ```
 <b>消费者：</b>
-```bash
+```java
 public class Customer {
     private static final String QUEUE_NAME= "test_queue_fanout_email";
     private static final String EXCHANGE_NAME= "test_exchange_fanout";
@@ -86,7 +86,7 @@ public class Customer {
 #### 路由模式
 路由模式采用的交换机类型为direct exchange，路由模式Java示例代码为：
 <b>生产者：</b>
-```bash
+```java
 public class RoutingSend {
     private static final String EXCHANGE_NAME ="test_exchange_direct";
     public static void main(String[] args) throws IOException, TimeoutException {
@@ -104,7 +104,7 @@ public class RoutingSend {
 ```
 <b>消费者：</b>  
 消费者模式代码与订阅模式消费者代码相似，只有一句代码需要更改
-```bash
+```java
 //将队列绑定到交换机并指定bind key
 channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "error");
 ```
@@ -112,7 +112,7 @@ channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "error");
 #### 主题模式
 主题面膜是采用的交换机类型为topic exchange,主题模式Java示例代码为：
 <b>生产者：</b>
-```bash
+```java
 public class TopicSend {
     private static final String EXCHANGE_NAME = "test_exchange_topic";
     public static void main(String[] args) throws IOException, TimeoutException {
@@ -129,12 +129,12 @@ public class TopicSend {
 ```
 <b>消费者1：</b>  
 消费者模式代码与路由模式消费者代码相似，只是bind key可以改用通配符
-```bash
+```java
 //将队列绑定到交换机并指定bind key
 channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "goods.#");
 ```
 <b>消费者2：</b>  
-```bash
+```java
 //将队列绑定到交换机并指定bind key
 channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, "goods.add");
 ```

@@ -25,7 +25,7 @@ Eureka是Netflix开发的一款服务的发现与注册框架，它本身是一�
 ##### 创建项目
 使用idea快速创建一个Empty Project,在Project中创建一个Springboot Module，等待初始化完成。
 ##### 更改pom文件
-```
+```xml
     ......省略
     <dependencyManagement>
         <dependencies>
@@ -56,7 +56,7 @@ Eureka是Netflix开发的一款服务的发现与注册框架，它本身是一�
     .......省略   
 ```
 ##### 更改application.yml配置文件
-```
+```yml
 server:
   port: 8100
 eureka:
@@ -74,7 +74,7 @@ spring:
 ```
 这里的eureka.instance.hostname我在hosts文件中做了映射，即eureka1 -> 127.0.0.1。
 ##### 编写启动类
-```
+```java
 /**
  * server 服务端
  */
@@ -97,7 +97,7 @@ public class SpringcloudEurekaApplication {
 再创建一个Springboot Module,作为一个服务注册到注册中心去。
 ##### 更改pom文件
 pom文件和上一个唯一的区别就是
-```
+```xml
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -108,7 +108,7 @@ pom文件和上一个唯一的区别就是
         </dependency>
 ```
 ##### 更改application配置文件
-```
+```yml
 server:
   port: 8000
 spring:
@@ -122,7 +122,7 @@ eureka:
     fetch-registry: true
 ```
 ##### 编写启动类
-```
+```java
 /**
  * client 客户端
  */
@@ -144,7 +144,7 @@ public class SpringcloudMemberApplication {
 Eureka集群的搭建其实很简单，就是做到“你中有我，我中有你”。什么意思呢？例如两个Eureka Server服务，在启动时分别将其注册到对方的注册中心去，这样当挂掉一个Eureka Server后，另外一台服务器能够顶替它的工作。三台，四台集群的原理其实和两台也是一样的。下面具体来实现一个简单的双服务器集群。
 ##### 更改Eureka1与Eureka2的application.yml配置文件
 <b>Eureka1</b>
-```
+```yml
 server:
   port: 8100
 eureka:
@@ -161,7 +161,7 @@ spring:
     name: microservice-eureka
 ```
 <b>Eureka2</b>
-```
+```yml
 server:
   port: 9100
 eureka:
@@ -178,7 +178,7 @@ spring:
     name: microservice-eureka
 ```
 <b>其它服务需要同时注册到两个Eureka1、Eureka2服务</b>
-```
+```yml
 server:
   port: 8000
 spring:

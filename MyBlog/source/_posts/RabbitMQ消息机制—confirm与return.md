@@ -24,7 +24,7 @@ date: 2019-07-14 21:20:00
 
 这里有一个demo对confirm确认消息机制进行代码表示，其Java代码示例为  
 <b>生产者：</b>
-```bash
+```java
 public class Producer {
     private static final String EXCHANGE_NAME = "test_confirm_exchange";
     public static void main(String[] args) throws IOException, TimeoutException {
@@ -52,7 +52,7 @@ public class Producer {
 }
 ```
 <b>消费者：</b>
-```bash
+```java
 public class Consumer {
     private static final String EXCHANGE_NAME = "test_confirm_exchange";
     private static final String QUEUE_NAME = "test_confirm_queue";
@@ -87,7 +87,7 @@ return消息机制流程图如下：
 ![return消息机制流程图](/images/pasted-9.png)
 这里有一个demo对return消息机制进行代码表示，其Java代码示例为  
 <b>生产者：</b>
-```bash
+```java
 public class Producer {
     private static final String EXCHANGE_NAME = "test_return_exchange";
     public static void main(String[] args) throws IOException, TimeoutException {
@@ -112,7 +112,7 @@ public class Producer {
 }
 ```
 <b>消费者（省略部分代码）：</b>
-```bash
+```java
 .........
  channel.queueBind(QUEUE_NAME,EXCHANGE_NAME,"return.#");
  ........

@@ -28,7 +28,7 @@ date: 2019-07-09 19:38:00
 * 同步方法  
 
 <b>同步代码块</b>：即对某一个代码块加同步锁，只有获得锁的线程才能执行该代码块的内容（不过对于代码块外的代码，不受锁的限制）。对于一个售票的demo，利用同步代码块保证线程安全的Java代码示例如下：
-```bash
+```java
 class SaleTicket implements Runnable {
     Object object = new Object();
     //共享数据
@@ -60,7 +60,7 @@ public class TestSaleTicket{
 }
 ```
 <b>同步方法</b>：对一个方法加同步锁，使得只有获得锁的线程才能执行该方法，需要注意的是对于非静态方法来说，锁对象为调用该同步方法的对象。对于静态方法来说，锁对象为同步方法所在类的class。对于上面的Demo,利用同步方法保证线程安全的Java代码示例如下：  
-```bash
+```java
 class SaleTicket implements Runnable {
     Object object = new Object();
     //共享数据
@@ -97,7 +97,7 @@ public class TestSaleTicket{
  public void unlock() //释放同步锁  
  
 同时lock()方法加锁后，必须手动的调用unlock()锁，否则会照成同步锁一直不被释放，其它线程始终获取不了执行权，形成死锁。所以lock()方法的内容最好使用try--catch包裹起来，在finally中调用unlock()方法。这样即使出现异常，也会执行unlock()方法，不会造成死锁。对于上面的Demo,利用同步方法保证线程安全的Java代码示例如下：  
-```bash
+```java
 class SaleTicket implements Runnable {
     /**
      * 参数true:公平锁，多个线程都公平的拥有执行权

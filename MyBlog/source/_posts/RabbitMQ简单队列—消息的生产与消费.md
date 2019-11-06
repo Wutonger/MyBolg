@@ -14,7 +14,7 @@ RabbitMQ简单队列十分的容易理解，分为消息的生产者与消费者
 生产者将“hello”这个消息发送到队列中，消费者从队列中接受该消息。  
 #### 引入依赖
 对RabbitMQ的安装与配置就不予赘述了，在Java代码中要使用RabbitMQ需要引入以下的依赖
-```bash
+```xml
     <dependency>
       <groupId>com.rabbitmq</groupId>
       <artifactId>amqp-client</artifactId>
@@ -23,7 +23,7 @@ RabbitMQ简单队列十分的容易理解，分为消息的生产者与消费者
 ```
 #### 建立连接对象
 这里的连接对象类似于操作数据库时JDBC中的Connection对象，需要指明RabbitMQ所在服务器的的IP+Port,以及VirtualHost（可以通俗的理解为数据库库名）,最重要的是用户名与密码。建立一个简单的RabbitMQ连接的单例类，代码如下
-```bash
+```java
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class ConnectionUtil {
 5. 关闭Channel与Connection
 建立生产者的Java代码如下  
 
-```bash 
+```java
 import com.lx.util.ConnectionUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -91,7 +91,7 @@ public class SimpleQueue {
 #### 创建消息的消费者
 创建消息的消费者前面两个步骤与创建生产者相同。当创建完Channel对象后，需要创建一个DefaultConsumer对象，并重写它的handleDelivery()方法，handleDelivery()方法中编写消费消息的内容。最后Channel需要监听Consumer,即从哪个队列中消费消息。建立消费者的Java代码如下
 
-```bash
+```java
 import com.lx.util.ConnectionUtil;
 import com.rabbitmq.client.*;
 

@@ -19,7 +19,7 @@ date: 2019-07-06 09:47:00
 
 #### 轮询分发
 轮询分发采用的是自动应答，即消费者消费完一条消息后不会手动的对队列做出应答，所以队列并不知道谁消费的快，谁消费的慢。故而无论多少个消费者，它的消息分配总是一个一条轮着来。轮询分发的核心Java代码如下
-```bash
+```java
         channel.queueDeclare(QUEUE_NAME,false,false,false,null);
         //3定义消费者监听
         Consumer defaultConsumer = new DefaultConsumer(channel){
@@ -50,7 +50,7 @@ date: 2019-07-06 09:47:00
 3. 最后在channel对customer进行监听时，设置手动应答，即basicConsume()方法中的autoAck变量的值为false  
 公平分发模式消费者核心Java代码如下  
 
-```bash
+```java
         channel.queueDeclare(QUEUE_NAME,false,false,false,null);
         channel.basicQos(1);
 

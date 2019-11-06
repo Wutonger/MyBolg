@@ -75,7 +75,7 @@ JVM的基本结构可以分为：类加载器、执行引擎、运行时数据�
 
 ## 例题
 一段java代码如下:  
-```code
+```java
 class StaticLoad {
 	private static StaticLoad staticLoad = new StaticLoad();
 
@@ -108,9 +108,3 @@ public class TestStaticLoadDemo {
 
 --- 
 注：本文参考了网上许多讲解JVM类加载的博客
-
-
-
-
-
-

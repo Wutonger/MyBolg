@@ -23,7 +23,7 @@ date: 2019-07-27 20:40:00
 
 ![线程修改共享变量](/images/pasted-11.png)
 也就是说多线程环境下，每个线程中修改的其实是线程工作空间拷贝的变量副本，并且彼此并不知道其它线程将该值修改到了多少，这就造成了一个很尴尬的局面—最后变量的值可能和我们所预期的不一样。我们来看一个简单的例子
-```bash
+```java
 public class VolatileDemo implements Runnable {
     private static boolean isRunning = true;
     public void run() {
@@ -56,7 +56,7 @@ public class VolatileDemo implements Runnable {
 
 ![运行结果](/images/pasted-13.png)
 这也就说明当主线程修改了isRunning的值为false后,另外一个线程对于这个值是可见的。但是我们要注意的是volatile只能保证变量的可见性，而<b>不能保证原子性</b>,即表示线程执行到一半或者刚获取到副本的值时cpu资源可以被其它线程剥夺。举个简单的例子，我们都知道count++不属于原子操作，它通常分为三个步骤，第一步拿到count的值,第二步执行count+1，第三步将第二步运算的结果赋值给count。那么用volatile修饰count，并在线程中执行count++会是怎样的呢？这里给出了一个JavaDemo的示例
-```bash
+```java
 public class VolatileCountDemo implements Runnable{
     private volatile static int count=0;
     public void run() {
@@ -91,7 +91,7 @@ public class VolatileCountDemo implements Runnable{
 
 #### Atomic类
 在java 1.5的java.util.concurrent.atomic包下提供了一些原子操作类，即对基本数据类型的 自增（加1操作），自减（减1操作）、以及加法操作（加一个数），减法操作（减一个数）进行了封装，保证这些操作是原子性操作。atomic是利用CAS来实现原子性操作的（Compare And Swap）。现在同样是上面那个例子，如果将count改为用AtomicInteger类来操作会有什么结果呢？Java代码示例如下
-```bash
+```java
 public class AtomicDemo implements Runnable{
     private  static AtomicInteger count= new AtomicInteger(0);
     static Object  object = new Object();
@@ -118,7 +118,7 @@ public class AtomicDemo implements Runnable{
 <b>什么是CAS（Compare And Swap）?</b>
 Compare And Swap中文翻译过来就是比较并变换。CAS 操作包含三个操作数 —— 内存位置（V）、预期原值（A）和新值(B)。如果内存位置的值与预期原值相匹配，那么处理器会自动将该位置值更新为新值。否则，处理器不做任何操作。无论哪种情况，它都会在 CAS 指令之前返回该位置的值。CAS 有效地说明了“我认为位置 V 应该包含值 A；如果包含该值，则将 B 放到这个位置；否则，不要更改该位置，只告诉我这个位置现在的值即可”。Java并发包(JUC)中大量使用了CAS操作,涉及到并发的地方都调用了sun.misc.Unsafe类方法进行CAS操作。
 下面我们就来看看当执行count.incrementAndGet()方法时发生了什么......
-```bash
+```java
      /**
      * Atomically increments by one the current value.
      *

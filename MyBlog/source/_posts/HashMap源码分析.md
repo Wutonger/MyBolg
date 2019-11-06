@@ -26,7 +26,7 @@ Map是Java集合中重要的分支之一。在工作中，我们经常会用到H
 #### 方法追踪
 ##### HashMap()方法
 HashMap为创建map集合时所使用的构造方法，它其中的类容很简单，只是简单的初始化了影响因子loadFactor为0.75,并没有初始化table的值
-```bash
+```java
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     public HashMap() {
         this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
@@ -34,7 +34,7 @@ HashMap为创建map集合时所使用的构造方法，它其中的类容很简�
 ```
 ##### put()方法
 我们都知道HashMap拥有无序、key不能重复、允许空值特点。那么它为何会有这些特点呢？这就要讲put()方法了。在添加元素时调用put方法。我们先来看看put方法的源码
-```bash
+```java
     public V put(K key, V value) {
         return putVal(hash(key), key, value, false, true);
     }
@@ -42,7 +42,7 @@ HashMap为创建map集合时所使用的构造方法，它其中的类容很简�
 我们发现put方法中其实是调用了putVal方法，而putVal方法中又调用了hash(key)方法。
 ##### hash()方法
 hash()方法其实是用来计算要添加元素的key的hash值，而hash值则关系到添加的元素在数组中存储的位置
-```bash
+```java
     static final int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
@@ -50,7 +50,7 @@ hash()方法其实是用来计算要添加元素的key的hash值，而hash值则
 ```
 ##### putVal()方法
 先贴出putVal()的源码
-```bash
+```Java
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                    boolean evict) {
         Node<K,V>[] tab; Node<K,V> p; int n, i;
