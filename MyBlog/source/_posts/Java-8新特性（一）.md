@@ -1,5 +1,8 @@
 title: Java 8新特性(一)
 author: Loux
+
+cover: /img/post/24.jpg
+
 tags:
 
   - 后端知识
