@@ -149,18 +149,7 @@ final boolean acquireQueued(final Node node, int arg) {
 4. 若排队轮到自己，则尝试tryAcquire()获取锁
 5. 若没有轮到自己，则重复第三步
 
-<b>第二种情况—非公平锁</b>
-
-```java
-final void lock() {
-            if (compareAndSetState(0, 1))
-                setExclusiveOwnerThread(Thread.currentThread());
-            else
-                acquire(1);
-        }
-```
-
-可以看出，非公平锁并不会先检查前面是否有等待的线程，而是先尝试用CAS操作更新state的值，若更新失败才去执行acquire方法。
+<b>第二种情况—非公平锁
 
 非公平锁的tryAcquire()方法也很简单
 
@@ -196,6 +185,59 @@ final boolean nonfairTryAcquire(int acquires) {
 * 非公平锁：先执行获取锁的操作，获取不到才将自己加入到等待队列中，轮到自己时，才获取锁
 
 ## unlock()方法源码分析
+
+对于unlock()方法的分析，在公平锁与非公平锁中，均为一种实现
+
+```java
+    public void unlock() {
+        sync.release(1);
+    }
+```
+
+可以看到，unlock()方法中，调用了release()方法，release()方法是AQS中的方法
+
+```java
+    public final boolean release(int arg) {
+        //调用tryRelease()方法尝试释放锁
+        if (tryRelease(arg)) {
+            //释放锁成功后唤醒满足条件的线程
+            Node h = head;
+            if (h != null && h.waitStatus != 0)
+                unparkSuccessor(h);
+            return true;
+        }
+        return false;
+    }
+```
+
+这个方法中会先执行tryRelease()释放锁，若释放成功，则获取队列的head线程判断其waitStatus是否不为0，若不为0则唤醒队列中第一个waitStatus<0的线程。接下来我们看看tryRelese()方法的源码
+
+```java
+protected final boolean tryRelease(int releases) {
+            //首先获取释放锁后state的值
+            int c = getState() - releases;
+            //当前线程不为拥有锁的线程（那还释放什么，直接抛出异常）
+            if (Thread.currentThread() != getExclusiveOwnerThread())
+                throw new IllegalMonitorStateException();
+            boolean free = false;
+            //若释放后，state==0说明释放锁之后锁空闲
+            if (c == 0) {
+                free = true;
+                setExclusiveOwnerThread(null);
+            }
+            //设置state的值
+            setState(c);
+            return free;
+        }
+```
+
+# 总结
+
+整体来看，ReentrantLock实现的方式其实就是通过FIFO队列来保存等待锁的线程。通过AQS类中的state保存锁的持有数量，从而实现可重入性。同时我们也要分清公平锁与非公平锁的区别。
+
+其实不止是ReentrantLock，JUC包下很多类都使用到了AQS类中的东西。AQS类可以说是并发编程的重中之重，我们一定要好好掌握。
+
+***
 
 
 
