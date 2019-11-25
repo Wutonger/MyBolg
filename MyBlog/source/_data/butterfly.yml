@@ -237,12 +237,12 @@ valine:
   enable: true # if you want use valine,please set this value is true
   appId:  coghx4LsQBz6t42xg6vy0f0H-gzGzoHsz
   appKey: btSfD3chE4XtusHDeTSoKOIB
-  notify: false # valine mail notify (true/false) https://github.com/xCss/Valine/wiki
+  notify: true # valine mail notify (true/false) https://github.com/xCss/Valine/wiki
   verify: false # valine verify code (true/false)
   pageSize: 10 # comment list page size
   avatar: monsterid # gravatar style https://valine.js.org/#/avatar
-  lang: en # i18n: zh-cn/en
-  placeholder: 不留下一点什么吗 # valine comment input placeholder(like: Please leave your footprints )
+  lang: zh-cn # i18n: zh-cn/en
+  placeholder: 留下你的足迹吧~ # valine comment input placeholder(like: Please leave your footprints )
   guest_info: nick,mail,link #valine comment header inf
 
 #####     Footer Settings    ####
