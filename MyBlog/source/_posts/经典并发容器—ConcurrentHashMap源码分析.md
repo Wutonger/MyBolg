@@ -1,17 +1,13 @@
 title: 经典并发容器—ConcurrentHashMap源码分析
 author: Loux
-
 cover: /img/post/27.jpg
-
 tags:
-
   - 并发编程
+  - 源码分析
 categories:
   - 并发编程
 date: 2019-12-18 11:15:00
-
 ---
-
 HashMap对于我们来说已经很了解了，在单线程环境操作Map时我们总会选择它。但是在多线程下对HashMap的操作可能会导致一些不能预估问题的发生，这主要是因为HashMap中的get()、put()等方法都不是线程安全的。我们可以看到HashMap源码中没有对多线程操作做处理。
 
 ![HashMap内部方法](/images/image-20191218113218923.png)
@@ -98,7 +94,7 @@ static final class Segment<K, V> extends ReentrantLock implements Seriali
 
 首先，它的基本结构还是和JAVA8中的HashMap一样，链表长度大于8且容量达到了64就会将链表变为红黑树，其目的是为了增加查找时的效率。
 
-而在线程安全方面，在Java8中主要是采用CAS操作与synchronized关键字来实现，相比于Java8，并发性能有了很大的提高。
+而在线程安全方面，在Java8中主要是采用CAS操作与synchronized关键字来实现，相比于Java7，并发性能有了很大的提高。
 
 ## ConcurrentHashMap的主要组成部分
 
