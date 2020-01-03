@@ -161,7 +161,7 @@ post_meta:
 
 # Please see doc for more details: https://jerryc.me/posts/21cfbf15/#字数统计
 wordcount:
-  enable: true
+  enable: false
 
 toc:
   enable: true
@@ -234,15 +234,15 @@ disqus:
 
 # valine comment system. https://valine.js.org
 valine:
-  enable: true # if you want use valine,please set this value is true
-  appId:  coghx4LsQBz6t42xg6vy0f0H-gzGzoHsz
-  appKey: btSfD3chE4XtusHDeTSoKOIB
-  notify: true # valine mail notify (true/false) https://github.com/xCss/Valine/wiki
+  enable: false # if you want use valine,please set this value is true
+  appId:   # leancloud application app id
+  appKey:   # leancloud application app key
+  notify: false # valine mail notify (true/false) https://github.com/xCss/Valine/wiki
   verify: false # valine verify code (true/false)
   pageSize: 10 # comment list page size
   avatar: monsterid # gravatar style https://valine.js.org/#/avatar
-  lang: zh-cn # i18n: zh-cn/en
-  placeholder: 留下你的足迹吧~ # valine comment input placeholder(like: Please leave your footprints )
+  lang: en # i18n: zh-cn/en
+  placeholder: Please leave your footprints # valine comment input placeholder(like: Please leave your footprints )
   guest_info: nick,mail,link #valine comment header inf
 
 #####     Footer Settings    ####
@@ -386,7 +386,7 @@ hr:
 subtitle: 
   enable: true
   sub1: Never stop thinking 
-  sub2: 热爱代码，热爱生活  #如果有符號 ' ，記得前面加上 \ 
+  sub2: 今年欢笑复明年，秋月春风等闲度  #如果有符號 ' ，記得前面加上 \ 
 
 
 
@@ -406,7 +406,7 @@ aside:
 
 # 網站公告
 announcement:
-  content: 欢迎访问本站，本站主要更新一些Java相关的技术文章
+  content: 感謝訪問本站，若喜歡請收藏 ^_^
 
 # busuanzi count for PV / UV in site
 # 訪問人數
