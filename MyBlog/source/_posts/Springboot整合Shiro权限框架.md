@@ -1,14 +1,12 @@
 title: Springboot整合Shiro权限框架
 author: Loux
 tags:
-
   - shiro
+  - Springboot系列
 categories:
   - 后端知识
-date: 2019-11-27 16:05:00
-
 cover: /img/post/5.jpg
-
+date: 2019-11-27 16:05:00
 ---
 
 网站的用户模块，免不了需要做权限管理，而Shiro框架则为我们提供了轻量级的用户认证、身份认证、加密等功能，为我们带来了极大的方便。
