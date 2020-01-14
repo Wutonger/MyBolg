@@ -1,7 +1,7 @@
 title: Java线程池的原理与使用—面试必备
 author: Loux
 
-cover: /img/post/24.jpg
+cover: /img/post/30.jpg
 
 tags:
 
@@ -331,10 +331,13 @@ handler — 当线程池中任务队列已经装满，又有新的任务提交�
 private boolean addWorker(Runnable firstTask, boolean core) {
         retry:
         for (;;) {
+            //获取到线程池状态
             int c = ctl.get();
             int rs = runStateOf(c);
 
-            // Check if queue empty only if necessary.
+            //若线程池状态大于等于Shutdown(stop,ditying,terminated)
+            //或firstTask != null 或 workQueue.isEmpty()
+            //则不创建新的线程，直接返回false
             if (rs >= SHUTDOWN &&
                 ! (rs == SHUTDOWN &&
                    firstTask == null &&
@@ -342,57 +345,195 @@ private boolean addWorker(Runnable firstTask, boolean core) {
                 return false;
 
             for (;;) {
+                //获取到线程数量
                 int wc = workerCountOf(c);
+                //线程数量是否大于最大数量 或 是否大于界限
+                //若条件满足一个，则直接返回false
                 if (wc >= CAPACITY ||
                     wc >= (core ? corePoolSize : maximumPoolSize))
                     return false;
+                //否则就可以创建线程准备执行任务了
+                //若cas成功，则直接跳出整个循环
+                //若cas失败说明有其它线程也在尝试在线程池中创建线程
                 if (compareAndIncrementWorkerCount(c))
                     break retry;
+                //由于并发原因，可能ctl的值已经被改变，重新获取一下
                 c = ctl.get();  // Re-read ctl
+                //若线程池的状态改变，再进行一次外层retry循环
                 if (runStateOf(c) != rs)
                     continue retry;
                 // else CAS failed due to workerCount change; retry inner loop
             }
         }
-
+        
+        //此时，我们已经可以创建线程了
         boolean workerStarted = false;
         boolean workerAdded = false;
         Worker w = null;
         try {
+            //新建一个worker(线程)，并赋予它task
             w = new Worker(firstTask);
             final Thread t = w.thread;
             if (t != null) {
+                //先加锁，保证线程安全
                 final ReentrantLock mainLock = this.mainLock;
                 mainLock.lock();
                 try {
-                    // Recheck while holding lock.
-                    // Back out on ThreadFactory failure or if
-                    // shut down before lock acquired.
+                    //获取线程池的状态
                     int rs = runStateOf(ctl.get());
-
+                    //判断线程池的状态
                     if (rs < SHUTDOWN ||
                         (rs == SHUTDOWN && firstTask == null)) {
-                        if (t.isAlive()) // precheck that t is startable
+                        //若新建线程为启动状态，直接抛出异常（我才创建，都没有启动）
+                        if (t.isAlive()) 
                             throw new IllegalThreadStateException();
+                        //将新worker添加进HashSet
                         workers.add(w);
                         int s = workers.size();
+                        //这里是为了记录线程池中线程的最大值
                         if (s > largestPoolSize)
                             largestPoolSize = s;
+                        //workerAdded=true，说明已经添加成功了
                         workerAdded = true;
                     }
                 } finally {
                     mainLock.unlock();
                 }
                 if (workerAdded) {
+                    //添加成功后启动线程，并设置workerStarted=true
                     t.start();
                     workerStarted = true;
                 }
             }
         } finally {
+            //若启动线程失败，则执行addWorkerFailed(w)方法
+            //其实里面的逻辑就是做清理工作，因为线程添加成功了但是启动失败了，肯定要清除添加的线程
             if (! workerStarted)
                 addWorkerFailed(w);
         }
+        //最后返回线程是否启动的boolean值
         return workerStarted;
     }
 ```
 
+我们来总结一下addWorker方法中的逻辑：
+
+第一步：首先查看线程池状态是否异常，若状态异常则直接返回false
+
+第二步：获取线程数量，判断线程数量是否超过限制，若超过则直接返回false
+
+第三步：以CAS的方式更新线程数量，然后新建worker对象加入HashSet并启动线程，启动失败执行清除操作，最后的返回值是用来判断线程是否启动的boolean值
+
+现在我们已经知道了线程池是怎样创建线程，怎样添加任务的了。那么workQueue队列中的任务又是怎么被执行的呢？还记得我们说了么，JDK将线程池中的线程封装为了Worker对象，要想知道如何执行，还需要看Worker的源码。
+
+```java
+    private final class Worker extends AbstractQueuedSynchronizer implements Runnable
+    {
+       
+        final Thread thread;
+        
+        Runnable firstTask;
+        
+        volatile long completedTasks;
+
+        Worker(Runnable firstTask) {
+            setState(-1); // inhibit interrupts until runWorker
+            this.firstTask = firstTask;
+            this.thread = getThreadFactory().newThread(this);
+        }
+    }
+```
+
+这里列出了一些主要的属性和构造方法。我们可以看到Worker中的构造方法接收了一个task，并且用`getThreadFactory().newThread(this)`方法创建的thread，也就是说是通过工厂创建的，还将Worker对象本身作为Runnable的实现传进了newThread(Runnable command)方法中，因为Worker是实现了Runnable接口的。也就是说在addWorker()方法中启动线程执行run()方法，其实就是执行Worker对象的run方法。而Worker类中run()方法如下：
+
+```java
+        public void run() {
+            runWorker(this);
+        }
+```
+
+接下来我们需要继续看ThreadPoolExecutor类中的runWorker(Runnable command)方法
+
+```java
+    final void runWorker(Worker w) {
+        Thread wt = Thread.currentThread();
+        //获取Worker对象的firstTask,可以为null
+        Runnable task = w.firstTask;
+        //获取成功后将Worker对象的firstTask设置为null，防止任务重复执行
+        w.firstTask = null;
+        w.unlock(); // allow interrupts
+        boolean completedAbruptly = true;
+        try {
+            //若没有firstTask则从workQueue中取出task
+            while (task != null || (task = getTask()) != null) {
+                //加锁
+                w.lock();
+                if ((runStateAtLeast(ctl.get(), STOP) ||
+                     (Thread.interrupted() &&
+                      runStateAtLeast(ctl.get(), STOP))) &&
+                    !wt.isInterrupted())
+                    wt.interrupt();
+                try {
+                    beforeExecute(wt, task);
+                    Throwable thrown = null;
+                    try {
+                        //执行task的run方法
+                        task.run();
+                    } catch (RuntimeException x) {
+                        thrown = x; throw x;
+                    } catch (Error x) {
+                        thrown = x; throw x;
+                    } catch (Throwable x) {
+                        thrown = x; throw new Error(x);
+                    } finally {
+                        afterExecute(task, thrown);
+                    }
+                } finally {
+                    //执行完成后清空task，进行下一次while循环getTask()
+                    task = null;
+                    //该worker对象执行完成的任务次数加1
+                    w.completedTasks++;
+                    //释放锁
+                    w.unlock();
+                }
+            }
+            completedAbruptly = false;
+        } finally {
+            //当没有workQueue中没有task可以执行 || 发生异常，调用processWorkerExit()方法
+            processWorkerExit(w, completedAbruptly);
+        }
+    }
+```
+
+这段代码其实就是循环从workQueue中取task然后执行，大意很好理解。但是里面的一些细节我还是不太懂，希望以后能够解决。
+
+# 总结
+
+到这里为止，线程池中创建线程、添加任务、执行任务的源码差不多已经分析完毕了。可能有一些地方表述不正确或不准确，还请指正。
+
+接下来对文中的一些比较重要的、面试中常常问到的进行一些总结。
+
+一、线程池中创建线程的时机有哪些？
+
+> * 如果当前线程数< corePoolSize时 ,在每次添加任务的时候会新建线程，此时界限为corePooSize
+> * 当线程数>corePoolSize时，会将任务放入队列中，此时会重新获取线程的数量，若为0，则会创建线程，此时界限为maximumPoolSize
+> * 若任务队列已满，会尝试创建线程，此时界限为maximumPoolSize
+
+二、什么时候会对任务采取拒绝策略？
+
+> * 在添加任务时线程数量达到了corePoolSize,会将任务入队列，但此时线程池不为running状态了，那么会将队列中的任务移除并执行拒绝策略
+> * 在添加任务时，线程数大于corePoolSize并且任务队列已经满了，此时会尝试创建线程，若线程数量已经达到了maximumPoolSize，则创建线程会失败，并对任务进行拒绝策略
+
+三、线程池中有哪些重要属性
+
+>* corePoolSize — 核心线程数
+>
+>* maximumPoolSize — 最大线程数，即线程池所允许创建的最大线程的数量
+>
+>* workQueue — 一个阻塞队列，用来保存线程池要执行的任务
+>
+>* keepAliveTime — 空闲线程的存活时间，当然如果关闭该线程后线程池中线程数量少于了corePoolSize，则空闲线程不会被关闭
+>
+>* threadFactory — 用于生成线程，一般我们使用默认的`Executors.defaultThreadFactory()`
+
+最后本文参考了文章<a href="https://javadoop.com/post/java-thread-pool">深度解读 java 线程池设计思想及源码实现</a>
