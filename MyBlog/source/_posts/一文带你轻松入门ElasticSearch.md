@@ -64,6 +64,14 @@ ES中有一些概念，在我们使用它之前，必须要对其有一定的认
 
 当然以上的类比也不是准确的，但是能让我们更快的入门ES。
 
+# ES的安装
+
+ES的安装十分简单，windows环境下直接在[官网](https://www.elastic.co/cn/)下载ElasticSearch的zip包解压缩即可。这里我使用的版本为**6.3.2**。在解压后启动bin目录下的elasticsearch.bat批处理文件，稍后打开浏览器输入localhost:9200,若显示以下界面，则说明ES的安装成功
+
+![](/images/image-20200116112437950.png)
+
+**需要注意，一定要提前安装好JDK8+以上的版本，并配置好环境变量。因为ES是基于java开发的，需要JAVA的运行环境。**
+
 # ES中的语法
 
 前面简介中提到了，ES中提供Restful Api来进行数据的访问。具体格式如下：
@@ -215,4 +223,45 @@ GET myblog/article/1
 ## queryString与term查询
 
 当然根据_id来查询太简单了。我们还需要一些复杂的查询。例如根据关键词查询，根据String查询。
+
+**term查询：**
+
+url为：
+
+`POST myblog/article/_search`
+
+requestBody为：
+
+```bash
+{
+  "query": {
+    "term": {
+      "title":"详"
+    }
+  }
+}
+```
+
+我们以title中的关键字关键字“详”进行查询。
+
+但是我们发现使用term查询只能输入一个汉字，若输入了多个汉字，查询到的结果就会为null，这是因为在我们设置myblog的mapping时，title字段"index"默认为“analyzed”，也就是说title中的每个词都会被分词器拆分后存储在title的索引中。例如“你好世界”在title的索引中会被拆分为["你","好","世","界"]，由于term是完全匹配，当你用“你好”进行搜索时，当然匹配不到任何结果，只有用单个字去搜索，才会匹配到正确的结果。
+
+**queryString查询：**
+
+请求的url和term查询是一样的，唯一不同的则是请求体。
+
+```bash
+{
+  "query": {
+    "query_string": {
+      "default_field": "title",
+      "query": "钢索"
+    }
+  }
+}
+```
+
+![](/images/image-20200116103334852.png)
+
+我们会发现搜索“钢索”为什么带“索”字的文档也在结果集中呢？这是因为ES中存在分词器这个概念，"钢索"这个短语会被ES中的标准分词器分为“刚”和“索”，这样带“刚”和“索”的title就都会被搜索到。
 
