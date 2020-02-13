@@ -97,7 +97,7 @@ deploy:
   type: git
   repo: 
     # github: git@github.com:Wutonger/Wutonger.github.io.git
-    coding: git@git.dev.tencent.com:Loux/Loux.git
+    coding: git@github.com:Wutonger/Wutonger.github.io.git
   branch: master
 #配置hexo admin用户权限
 admin:
