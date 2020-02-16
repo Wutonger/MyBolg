@@ -166,7 +166,7 @@ public @interface HystrixCommand {
 * **groupKey**— 配置全局唯一标识服务分组的名称 ，一般同一个服务的调用使用同一个分组。例如在用户服务中定义了很多访问课程服务的接口，也就是说有很多@HystrixCommand注解，那么最好将这些注解中的groupKey设置为相同。因为 Hystrix会让相同groupKey值的操作使用同一个线程池 
 * **threadPoolKey**— 对线程池进行设定，细粒度的配置，相当于对单个服务的线程池信息进行设置，也可多个服务设置同一个threadPoolKey构成线程组
 *  **commandProperties**—配置@HystrixCommand的属性，比如采用信号量隔离还是线程隔离。默认采用线程隔离。
-*  **threadPoolProperties** —对线程池进行配置，比如核心线程数，最大线程数等，对线程池中参数含义不了解的，可以看我的另外一篇文章 <a href=" [https://www.lxfun.cn/2020/01/13/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E2%80%94%E9%9D%A2%E8%AF%95%E5%BF%85%E5%A4%87/](https://www.lxfun.cn/2020/01/13/Java线程池的原理与使用—面试必备/) ">Java线程池的原理与使用—面试必备</a>
+*  **threadPoolProperties** —对线程池进行配置，比如核心线程数，最大线程数等，对线程池中参数含义不了解的，可以看我的另外一篇文章 <a href=" https://www.lxfun.cn/2020/01/13/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%8E%9F%E7%90%86%E4%B8%8E%E4%BD%BF%E7%94%A8%E2%80%94%E9%9D%A2%E8%AF%95%E5%BF%85%E5%A4%87/">Java线程池的原理与使用—面试必备</a>
 *  **ignoreExceptions** —Hystrix中默认除了HystrixBadRequestException外，其它异常均会被Hystrix判定为执行失败，而执行fallbackMethod，若我们想要哪些异常被允许，不执行fallbackMethod，在此属性中定义
 
 接下来我们只启动用户服务，不启动课程服务，访问获取课程服务接口的api，看是什么效果
