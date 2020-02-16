@@ -97,7 +97,7 @@ deploy:
   type: git
   repo: 
     # github: git@github.com:Wutonger/Wutonger.github.io.git
-    coding: git@github.com:Wutonger/Wutonger.github.io.git
+    coding: git@e.coding.net:Loux/MyBlog.git
   branch: master
 #配置hexo admin用户权限
 admin:
