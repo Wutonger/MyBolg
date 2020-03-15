@@ -249,15 +249,15 @@ valine:
 # ------------------------------------
 since: 2018
 
-footer_custom_text: <a href="https://www.upyun.com/"><img src="/images/upyun.png" style="width:86px;vertical-align:middle;"/></a>
+footer_custom_text: <a href="https://www.upyun.com/"><img src="/images/upyun.png" style="width:86px;vertical-align:middle;"/></a><br/><a href="http://beian.miit.gov.cn/" target="_blank">蜀ICP备17032469号</a>
 
 footer_copyright:
   enable: true
 
 ICP:
-  enable: true
+  enable: false
   url: 
-  text: 蜀ICP备17032469号
+  text: 
 
 
 ####    站長驗證    ####

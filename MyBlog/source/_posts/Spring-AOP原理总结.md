@@ -1,15 +1,12 @@
 title: Spring AOP原理总结（基于注解）
 author: Loux
-
 cover: /img/post/34.jpg
-
 tags:
-
   - spring
 categories:
-  - 源码分析
+  - Spring系列
+  - ''
 date: 2020-03-08 20:14:00
-
 ---
 
 相信在工作中，我们都用过Spring的面向切面编程，即降低了代码的耦合性又提升了开发维护效率。
