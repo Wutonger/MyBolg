@@ -140,8 +140,93 @@ Spring AOP到底是什么呢，或者我们应该怎样准确的描述该技术�
 
 ### 方法执行流程
 
-第一步：利用CglibAopProxy.intercept()拦截目标方法；
+第一步：在执行目标方法时，CglibAopProxy类的intercept()方法会先于目标方法执行
 
-第二步：根据ProxyFactory对象获取将要执行目标方法的拦截器链(将增强器包装为拦截器MethodInterceptor)；
+```java
+		@Override
+		public Object intercept(Object proxy, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+			Object oldProxy = null;
+			boolean setProxyContext = false;
+			Class<?> targetClass = null;
+			Object target = null;
+			try {
+				if (this.advised.exposeProxy) {
+					// Make invocation available if necessary.
+					oldProxy = AopContext.setCurrentProxy(proxy);
+					setProxyContext = true;
+				}
+				target = getTarget();
+				if (target != null) {
+					targetClass = target.getClass();
+				}
+                  //获取目标方法将要执行的拦截器链
+				List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
+				Object retVal;
+                  //如果拦截器链为空，则通过反射执行目标方法
+				if (chain.isEmpty() && Modifier.isPublic(method.getModifiers())) {
+					Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
+					retVal = methodProxy.invoke(target, argsToUse);
+				}
+				else {
+					// We need to create a method invocation...
+                        //根据代理对象、目标对象、目标方法、参数、拦截器链等信息构建CglibMethodInvocation对象
+                        //并执行对象的proceed()方法，即执行拦截器链
+					retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();
+				}
+				retVal = processReturnType(proxy, target, method, retVal);
+				return retVal;
+			}
+			finally {
+				if (target != null) {
+					releaseTarget(target);
+				}
+				if (setProxyContext) {
+					// Restore old proxy.
+					AopContext.setCurrentProxy(oldProxy);
+				}
+			}
+		}
+```
 
-第三步：根据拦截器链式机制，依次进入每一个拦截器执行目标方法 前置通知->目标方法 -> 后置通知 -> 返回通知 or 异常通知；
+第二步：根据ProxyFactory对象获取将要执行目标方法的拦截器链(将增强器包装为拦截器MethodInterceptor[])，有些增强器实现了MethodInterceptor接口，而有些则需要适配器转换
+
+第三步：根据拦截器链式机制—递归调用，依次进入每一个拦截器。每一个拦截器总是等待下一个拦截器执行完成之后，再执行自身的方法，AOP精髓。
+
+以图来表示该流程
+
+![链式执行流程](/images/image-20200318232656888.png)
+
+需要注意的是11那里，当执行返回通知异常时，就会被AspectJAfterThrowingAdvice 捕获，并在catch中执行异常通知。
+
+`proceed()`方法源码如下：
+
+```java
+	public Object proceed() throws Throwable {
+        //currentInterceptorIndex默认值为-1
+		//如果没有拦截器，则直接执行目标方法
+        //或者拦截器的索引与拦截器数量减1相等，也是执行目标方法
+		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+			return invokeJoinpoint();
+		}
+        
+		Object interceptorOrInterceptionAdvice =
+		this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
+		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
+			// Evaluate dynamic method matcher here: static part will already have
+			// been evaluated and found to match.
+			InterceptorAndDynamicMethodMatcher dm =
+					(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
+			if (dm.methodMatcher.matches(this.method, this.targetClass, this.arguments)) {
+				return dm.interceptor.invoke(this);
+			}
+			else {
+				return proceed();
+			}
+		}
+		else {
+			//递归调用
+			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
+		}
+	}
+```
+
